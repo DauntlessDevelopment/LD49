@@ -6,19 +6,27 @@ public class FloorTile : MonoBehaviour
 {
     private float lifespan = 1.5f;
     private bool degraded = false;
+    private Vector3 init_pos;
     // Start is called before the first frame update
     void Start()
     {
-        
+        init_pos = transform.position;
+        lifespan += Random.Range(-0.5f, 0.2f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (transform.position.y < -50f)
+        if (transform.position.y < -100f)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
             //perhaps reset instead of destroy
+            degraded = false;
+            GetComponent<MeshRenderer>().material.color = Color.white;
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            transform.position = init_pos;
+
         }
     }
 
