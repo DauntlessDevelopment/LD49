@@ -23,7 +23,7 @@ public class ObstacleSpawner : MonoBehaviour
     {
         while(true)
         {
-            Instantiate(obstacle_prefab.gameObject, transform.position, obstacle_prefab.transform.rotation);
+            Instantiate(obstacle_prefab.gameObject, transform.position, transform.rotation * obstacle_prefab.transform.rotation );
             yield return new WaitForSeconds(spawn_timer);
         }
     }

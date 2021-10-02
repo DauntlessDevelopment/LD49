@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
+    private float lifespan = 8f;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,13 +32,20 @@ public class Obstacle : MonoBehaviour
     IEnumerator StuckObjectCleanup()
     {
         yield return new WaitForSeconds(1);
+        float life_remaining = lifespan;
         while(true)
         {
-            if(GetComponent<Rigidbody>().velocity.magnitude < 0.2f)
+            if(GetComponent<Rigidbody>().velocity.magnitude < 0.1f)
             {
                 Destroy(gameObject);
             }
-            yield return new WaitForSeconds(0.5f);
+            float interval = 0.5f;
+            yield return new WaitForSeconds(interval);
+            life_remaining -= interval;
+            if(life_remaining <= 0)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

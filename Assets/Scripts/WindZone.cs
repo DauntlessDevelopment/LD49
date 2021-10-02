@@ -10,6 +10,8 @@ public class WindZone : MonoBehaviour
     void Start()
     {
         force = transform.rotation * force;
+        //GetComponentInChildren<ParticleSystem>().startRotation =  transform.rotation.y - 90;
+        //GetComponentInChildren<ParticleSystem>().main
     }
 
     // Update is called once per frame
@@ -20,19 +22,10 @@ public class WindZone : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        //other.attachedRigidbody.AddForce(Vector3.right * 0.1f);
         if(other.tag == "Player")
         {
             other.GetComponent<Player>().wind_force = force;
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        //other.attachedRigidbody.AddForce(Vector3.right * 0.1f);
-        if (other.tag == "Player")
-        {
-            //other.GetComponent<Player>().wind_force -= force;
-        }
-    }
 }
