@@ -21,8 +21,9 @@ public class Player : MonoBehaviour
         HandleInput();
         if(transform.position.y < -10f)
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(1);
         }
+
  
     }
 
@@ -47,6 +48,13 @@ public class Player : MonoBehaviour
         if(Input.GetButtonDown("Jump") && Physics.Raycast(transform.position, -transform.up, 1.5f))
         {
             GetComponent<Rigidbody>().AddForce(transform.up * 10f);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Finish")
+        {
+            SceneManager.LoadScene(0);
         }
     }
 }

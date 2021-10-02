@@ -18,6 +18,7 @@ public class FloorTile : MonoBehaviour
         if (transform.position.y < -50f)
         {
             Destroy(gameObject);
+            //perhaps reset instead of destroy
         }
     }
 
