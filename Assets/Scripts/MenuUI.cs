@@ -9,11 +9,12 @@ public class MenuUI : MonoBehaviour
     [SerializeField] private Text stats_text;
     [SerializeField] private Text ironman_button_text;
 
-    //public List<Selectable> buttons = new List<Selectable>();
-    //int button_index = 0;
+
 
     public Selectable play;
+    public Canvas help_canvas;
 
+    public Selectable help_return;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,34 +25,6 @@ public class MenuUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if(buttons.Count > 0)
-        //{
-        //    if (Input.GetAxisRaw("Vertical") > 0)
-        //    {
-        //        if (button_index == 0)
-        //        {
-        //            button_index = buttons.Count - 1;
-        //        }
-        //        else
-        //        {
-        //            button_index -= 1;
-        //        }
-        //        buttons[button_index].Select();
-        //    }
-        //    if (Input.GetAxisRaw("Vertical") < 0)
-        //    {
-        //        if (button_index == buttons.Count - 1)
-        //        {
-        //            button_index = 0;
-        //        }
-        //        else
-        //        {
-        //            button_index += 1;
-        //        }
-        //        buttons[button_index].Select();
-
-        //    }
-        //}
         
     }
 
@@ -78,5 +51,18 @@ public class MenuUI : MonoBehaviour
     {
         data_container.ironman = !data_container.ironman;
         RefreshUI();
+    }
+
+    public void HelpToggle()
+    {
+        help_canvas.gameObject.SetActive(!help_canvas.gameObject.activeSelf);
+        if(help_canvas.gameObject.activeSelf)
+        {
+            help_return.Select();
+        }
+        else
+        {
+            play.Select();
+        }
     }
 }

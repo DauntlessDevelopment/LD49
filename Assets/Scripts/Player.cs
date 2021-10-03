@@ -230,7 +230,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Finish" && checkpoint > 1)
+        if (other.gameObject.tag == "Finish")
         {
             GetComponent<AudioSource>().Stop();
             GetComponent<AudioSource>().PlayOneShot(victory_sound);
@@ -271,7 +271,5 @@ public class Player : MonoBehaviour
 
     //Additional Needs:
     //Music?
-    //Polish UI/Menu
-    //4th stage?
 
 }

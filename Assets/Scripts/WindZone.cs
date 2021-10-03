@@ -5,6 +5,7 @@ using UnityEngine;
 public class WindZone : MonoBehaviour
 {
     private Vector3 force = Vector3.right * 0.05f;
+    public float force_mod = 1f;
     //public Vector3 wind_direction;
     // Start is called before the first frame update
     void Start()
@@ -24,7 +25,7 @@ public class WindZone : MonoBehaviour
     {
         if(other.tag == "Player")
         {
-            other.GetComponent<Player>().wind_force = force;
+            other.GetComponent<Player>().wind_force = force * force_mod;
         }
     }
 

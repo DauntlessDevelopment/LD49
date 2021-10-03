@@ -20,7 +20,7 @@ public class Ram : MonoBehaviour
         init_pos = transform.position;
         ram_speed = Random.Range(0.1f, 10f);
         ram_rate = Random.Range(0.3f, 3f);
-        max_distance = Random.Range(1, max_distance);
+        //max_distance = Random.Range(1, max_distance);
         StartCoroutine(Run());
     }
 
@@ -36,7 +36,7 @@ public class Ram : MonoBehaviour
             }
             else
             {
-                transform.Translate(-transform.right * Time.deltaTime * ram_speed);
+                transform.Translate(-transform.right * Time.deltaTime * ram_speed, Space.World);
                 distance_moved += Time.deltaTime * ram_speed;
             }
         }
@@ -51,7 +51,7 @@ public class Ram : MonoBehaviour
             }
             else
             {
-                transform.Translate(transform.right * Time.deltaTime * ram_speed);
+                transform.Translate(transform.right * Time.deltaTime * ram_speed, Space.World);
                 distance_moved -= Time.deltaTime * ram_speed;
             }
         }
