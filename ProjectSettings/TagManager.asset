@@ -7,6 +7,8 @@ TagManager:
   - Bounce
   - Checkpoint
   - FloorTile
+  - Soft
+  - Hard
   layers:
   - Default
   - TransparentFX

@@ -27,6 +27,18 @@ public class Player : MonoBehaviour
     [SerializeField] int checkpoint = 0;
     private bool ironman;
 
+
+    [SerializeField] private List<AudioClip> jump_sounds = new List<AudioClip>(6);
+    [SerializeField] private List<AudioClip> soft_impact_sounds = new List<AudioClip>(3);
+    [SerializeField] private List<AudioClip> hard_impact_sounds = new List<AudioClip>(4);
+    [SerializeField] private AudioClip victory_sound;
+    [SerializeField] private AudioClip checkpoint_sound;
+    [SerializeField] private AudioClip death_sound;
+    [SerializeField] private AudioClip bounce_sound;
+
+
+    private float moved_distance = 0f;
+
     private void Awake()
     {
         Time.timeScale = 1;
@@ -44,10 +56,13 @@ public class Player : MonoBehaviour
     {
         HandleInput();
 
-        if (transform.position.y < -10f)
+        if (transform.position.y < -10f && !GetComponent<AudioSource>().isPlaying)
         {
-            //SceneManager.LoadScene(1);
-            transform.position = last_checkpoint.position + new Vector3(0,transform.localScale.y, 0);
+            GetComponent<AudioSource>().PlayOneShot(death_sound);
+        }
+        if(transform.position.y < -15f)
+        {
+            transform.position = last_checkpoint.position + new Vector3(0, transform.localScale.y, 0);
             death_count++;
             data.total_deaths++;
         }
@@ -84,11 +99,12 @@ public class Player : MonoBehaviour
         if (Input.GetAxisRaw("Vertical") != 0)
         {
             transform.Translate(transform.forward * Input.GetAxisRaw("Vertical") * Time.deltaTime * move_speed, Space.World);
-            
+            moved_distance += Input.GetAxisRaw("Vertical") * Time.deltaTime * move_speed;
         }
         if (Input.GetAxisRaw("Horizontal") != 0)
         {
             transform.Translate(transform.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * move_speed, Space.World);
+            moved_distance += Input.GetAxisRaw("Horizontal") * Time.deltaTime * move_speed;
         }
         //new_vel.x = Input.GetAxisRaw("Horizontal")  * move_speed;
         //new_vel.z = Input.GetAxisRaw("Vertical")  * move_speed;
@@ -106,7 +122,44 @@ public class Player : MonoBehaviour
         if(Input.GetButtonDown("Jump") && Physics.Raycast(transform.position, -transform.up, 1.5f))
         {
             GetComponent<Rigidbody>().AddForce(transform.up * 5f);
+
+            int i = Random.Range(0, jump_sounds.Count);
+            GetComponent<AudioSource>().PlayOneShot(jump_sounds[i]);
         }
+
+        bool hard_surface = true;
+
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position, -transform.up, out hit, 1.5f, 2))
+        {
+            if(hit.transform.tag == "Hard")
+            {
+                hard_surface = true;
+            }
+            else
+            {
+                hard_surface = false;
+            }
+
+
+            if (moved_distance > 2)
+            {
+                if (hard_surface)
+                {
+                    int i = Random.Range(0, hard_impact_sounds.Count);
+                    GetComponentInChildren<AudioSource>().PlayOneShot(hard_impact_sounds[i]);
+                }
+                else
+                {
+                    int i = Random.Range(0, soft_impact_sounds.Count);
+                    GetComponentInChildren<AudioSource>().PlayOneShot(soft_impact_sounds[i]);
+                }
+
+                moved_distance = 0;
+
+            }
+        }
+
 
 
     }
@@ -116,29 +169,29 @@ public class Player : MonoBehaviour
         {
             last_checkpoint = collision.transform;
             checkpoint++;
+            if(checkpoint > 1)
+            {
+                GetComponent<AudioSource>().PlayOneShot(checkpoint_sound);
+            }
+
         }
-        if (collision.gameObject.tag == "Bounce")
+        if (collision.gameObject.GetComponent<Collider>().material.bounciness == 1)
         {
             GetComponent<Rigidbody>().AddForce(Vector3.up * 3f);
-            GetComponentInChildren<AudioSource>().Play();
+            GetComponentInChildren<AudioSource>().PlayOneShot(bounce_sound);
         }
 
-        //if(collision.gameObject.tag == "Bounce")
-        //{
-        //    if(Time.timeSinceLevelLoad > last_bounce + 3f)
-        //    {
-        //        bounce_count = 0;
-        //    }
-        //    if(bounce_count == 0)
-        //    {
-        //        GetComponent<Rigidbody>().AddForce(Vector3.Reflect(GetComponent<Rigidbody>().velocity, Vector3.up) * 10f);
-        //    }
-        //    else
-        //    {
-        //        GetComponent<Rigidbody>().AddForce((transform.forward + Vector3.up) * 10f);
-        //    }
-        //    last_bounce = Time.timeSinceLevelLoad;
-        //}
+        if(collision.gameObject.tag == "Hard")
+        {
+            int i = Random.Range(0, hard_impact_sounds.Count);
+            GetComponentInChildren<AudioSource>().PlayOneShot(hard_impact_sounds[i]);
+        }
+        else
+        {
+            int i = Random.Range(0, soft_impact_sounds.Count);
+            GetComponentInChildren<AudioSource>().PlayOneShot(soft_impact_sounds[i]);
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -149,7 +202,9 @@ public class Player : MonoBehaviour
             //freeze timer
             //save time
             //show menu
-            stats_text.text = $"{timer}\n{death_count}\nN/A";
+            stats_text.text = $"{timer}\n\n{death_count}\n\nN/A";
+            GetComponent<AudioSource>().PlayOneShot(victory_sound);
+
             if (ironman)
             {
                 if (timer < data.fastest_ironman)
@@ -171,18 +226,6 @@ public class Player : MonoBehaviour
             Time.timeScale = 0;
         }
     }
-
-
-    //Sound Effects Needed:
-    //Soft Impact
-    //Hard/Stone Impact
-    //Jump
-    //Step (soft&hard)
-    //Victory sound
-    //Checkpoint sound
-    //Death sound
-    //Falling sound
-
 
     //Additional Needs:
     //Choice of two gamemodes

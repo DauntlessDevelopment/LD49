@@ -25,6 +25,7 @@ public class FloorTile : MonoBehaviour
             GetComponent<MeshRenderer>().material.color = Color.white;
             GetComponent<Rigidbody>().useGravity = false;
             GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            GetComponent<Collider>().isTrigger = false;
             transform.position = init_pos;
 
         }
@@ -42,6 +43,7 @@ public class FloorTile : MonoBehaviour
 
         GetComponent<Rigidbody>().useGravity = true;
         GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
+        GetComponent<Collider>().isTrigger = true;
     }
 
     private void OnCollisionEnter(Collision collision)
