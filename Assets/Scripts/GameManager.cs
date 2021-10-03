@@ -8,7 +8,12 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Confined;
+
+        
+        if(SceneManager.GetActiveScene().name == "Menu")
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }
     }
 
     // Update is called once per frame
@@ -20,6 +25,7 @@ public class GameManager : MonoBehaviour
     public void LoadGame()
     {
         SceneManager.LoadScene(1);
+        Cursor.lockState = CursorLockMode.Locked;
     }
     public void LoadMenu()
     {
@@ -30,4 +36,6 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+
 }

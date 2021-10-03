@@ -24,6 +24,9 @@ public class Player : MonoBehaviour
 
     public GameObject end_popup;
 
+    public Selectable end_screen_default;
+    public Selectable pause_screen_default;
+
     [SerializeField] int checkpoint = 0;
     private bool ironman;
 
@@ -35,20 +38,22 @@ public class Player : MonoBehaviour
     [SerializeField] private AudioClip checkpoint_sound;
     [SerializeField] private AudioClip death_sound;
     [SerializeField] private AudioClip bounce_sound;
-
+    [SerializeField] private Canvas pause_menu;
 
     private float moved_distance = 0f;
 
     private void Awake()
     {
         Time.timeScale = 1;
-        data = new PlayerStats();
+        data = GameObject.Find("DataContainer").GetComponent<DataContainer>().player_data;
+        ironman = GameObject.Find("DataContainer").GetComponent<DataContainer>().ironman;
+        Cursor.lockState = CursorLockMode.Locked;
+        Debug.Log("Awake");
     }
     // Start is called before the first frame update
     void Start()
     {
         init_pos = transform.position;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -56,13 +61,20 @@ public class Player : MonoBehaviour
     {
         HandleInput();
 
-        if (transform.position.y < -10f && !GetComponent<AudioSource>().isPlaying)
+        if (transform.position.y < -7f && !GetComponent<AudioSource>().isPlaying)
         {
             GetComponent<AudioSource>().PlayOneShot(death_sound);
         }
         if(transform.position.y < -15f)
         {
-            transform.position = last_checkpoint.position + new Vector3(0, transform.localScale.y, 0);
+            if(ironman)
+            {
+                transform.position = init_pos;
+            }
+            else
+            {
+                transform.position = last_checkpoint.position + new Vector3(0, transform.localScale.y, 0);
+            }
             death_count++;
             data.total_deaths++;
         }
@@ -93,9 +105,35 @@ public class Player : MonoBehaviour
         transform.Translate(wind_force, Space.World);
     }
 
+    public void Pause()
+    {
+        if(!end_popup.activeSelf)
+        {
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+                pause_menu.gameObject.SetActive(false);
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Time.timeScale = 0;
+                pause_menu.gameObject.SetActive(true);
+                Cursor.lockState = CursorLockMode.Confined;
+                pause_screen_default.Select();
+            }
+        }
+
+
+    }
+
     private void HandleInput()
     {
-        //Vector3 new_vel = GetComponent<Rigidbody>().velocity;
+        if(Input.GetButtonDown("Pause"))
+        {
+            Pause();
+        }
+
         if (Input.GetAxisRaw("Vertical") != 0)
         {
             transform.Translate(transform.forward * Input.GetAxisRaw("Vertical") * Time.deltaTime * move_speed, Space.World);
@@ -106,11 +144,7 @@ public class Player : MonoBehaviour
             transform.Translate(transform.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * move_speed, Space.World);
             moved_distance += Input.GetAxisRaw("Horizontal") * Time.deltaTime * move_speed;
         }
-        //new_vel.x = Input.GetAxisRaw("Horizontal")  * move_speed;
-        //new_vel.z = Input.GetAxisRaw("Vertical")  * move_speed;
-        //new_vel = transform.rotation * new_vel;
-        //Debug.Log(new_vel);
-        //GetComponent<Rigidbody>().velocity = new_vel;
+
         if (Input.GetAxisRaw("Vertical2") != 0)
         {
             head.transform.Rotate(Vector3.right, Input.GetAxisRaw("Vertical2") * Time.deltaTime * turn_speed);
@@ -198,40 +232,46 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.tag == "Finish" && checkpoint > 1)
         {
-            //play victory sound
-            //freeze timer
-            //save time
-            //show menu
-            stats_text.text = $"{timer}\n\n{death_count}\n\nN/A";
+            GetComponent<AudioSource>().Stop();
             GetComponent<AudioSource>().PlayOneShot(victory_sound);
-
+            Debug.Log("GameEnd");
             if (ironman)
             {
-                if (timer < data.fastest_ironman)
+                stats_text.text = $"{timer}\n\n{death_count}\n\n{data.fastest_ironman}";
+                Debug.Log("Ironman Enabled");
+                Debug.Log($"Previous Time : {data.fastest_ironman} | Current Time : {timer}");
+                if (timer < data.fastest_ironman || data.fastest_ironman == 0)
                 {
+                    Debug.Log("Ironman Time Beaten");
                     data.fastest_ironman = timer;
                     data.perfect_runs++;
                 }
+
             }
             else
             {
-                if (timer < data.fastest_time)
+                stats_text.text = $"{timer}\n\n{death_count}\n\n{data.fastest_time}";
+                Debug.Log("Ironman Disabled");
+                Debug.Log($"Previous Time : {data.fastest_time} | Current Time : {timer}");
+                if (timer < data.fastest_time || data.fastest_time == 0)
                 {
+                    Debug.Log("Normal Time Beaten");
                     data.fastest_time = timer;
                 }
             }
 
             Debug.LogError("DONE");
             end_popup.SetActive(true);
+            end_screen_default.Select();
+            SaveSystem.Save(data);
+            Cursor.lockState = CursorLockMode.Confined;
             Time.timeScale = 0;
         }
     }
 
     //Additional Needs:
-    //Choice of two gamemodes
-    //Saving and loading of data
     //Music?
     //Polish UI/Menu
-    //Navigate Menus with controller????????
-    //Add pause menu
+    //4th stage?
+
 }
